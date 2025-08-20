@@ -1,39 +1,43 @@
 package com.JYA_proyecto.JYA_proyecto.model;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "rol")
-public class Rol implements Serializable {
+public class Rol {
 
-    private static final long serialVersionUID = 1L;
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rol")
     private Long idRol;
-    
+
+    // Debe guardar "ROLE_ADMIN" o "ROLE_USER"
+    @Column(nullable = false)
     private String nombre;
-    
-    @Column(name = "id_usuario")
-    private Long idUsuario;
 
-    // Constructores
-    public Rol() {}
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
 
-    public Rol(String nombre, Long idUsuario) {
-        this.nombre = nombre;
-        this.idUsuario = idUsuario;
+    // ====== Getters & Setters ======
+    public Long getIdRol() {
+        return idRol;
+    }
+    public void setIdRol(Long idRol) {
+        this.idRol = idRol;
     }
 
-    // Getters y Setters
-    public Long getIdRol() { return idRol; }
-    public void setIdRol(Long idRol) { this.idRol = idRol; }
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public Long getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+    public Usuario getUsuario() {
+        return usuario;
+    }
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }

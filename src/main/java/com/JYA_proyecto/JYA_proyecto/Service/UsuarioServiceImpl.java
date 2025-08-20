@@ -1,22 +1,25 @@
 package com.JYA_proyecto.JYA_proyecto.service;
 
-import com.JYA_proyecto.JYA_proyecto.dao.RolDao;
 import com.JYA_proyecto.JYA_proyecto.dao.UsuarioDao;
-import com.JYA_proyecto.JYA_proyecto.model.Rol;
 import com.JYA_proyecto.JYA_proyecto.model.Usuario;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-    
+
     @Autowired
     private UsuarioDao usuarioDao;
-    
+
     @Autowired
-    private RolDao rolDao;
+    private PasswordEncoder passwordEncoder;
+
+    private boolean isBcrypt(String p) {
+        return p != null && (p.startsWith("$2a$") || p.startsWith("$2b$") || p.startsWith("$2y$"));
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -38,12 +41,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public Usuario getUsuarioPorUsernameYPassword(String username, String password) {
-        return usuarioDao.findByUsernameAndPassword(username, password);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Usuario getUsuarioPorUsernameOCorreo(String username, String correo) {
         return usuarioDao.findByUsernameOrCorreo(username, correo);
     }
@@ -56,15 +53,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public void save(Usuario usuario, boolean crearRolUser) {
-        usuario = usuarioDao.save(usuario);
-        if (crearRolUser) {
-            // Si se está creando el usuario, se crea el rol por defecto "USER"
-            Rol rol = new Rol();
-            rol.setNombre("ROLE_USER");
-            rol.setIdUsuario(usuario.getIdUsuario());
-            rolDao.save(rol);
+    public void save(Usuario u, boolean crearRolUser) {
+        // Codifica SOLO si viene en plano (o si no parece BCrypt)
+        if (u.getPassword() != null && !u.getPassword().isBlank() && !isBcrypt(u.getPassword())) {
+            u.setPassword(passwordEncoder.encode(u.getPassword()));
         }
+        // TODO: si "crearRolUser" implica asignar rol, hazlo aquí.
+        usuarioDao.save(u);
     }
 
     @Override

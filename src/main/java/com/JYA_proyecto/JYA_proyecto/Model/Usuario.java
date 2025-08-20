@@ -1,78 +1,106 @@
 package com.JYA_proyecto.JYA_proyecto.model;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "usuario")
-public class Usuario implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Long idUsuario;
-    
-    @Column(unique = true)
+
+    @Column(nullable = false, unique = true)
     private String username;
-    
+
+    @Column(nullable = false)
     private String password;
+
     private String nombre;
     private String apellidos;
-    
-    @Column(unique = true)
     private String correo;
-    
     private String telefono;
+
+    @Column(name = "ruta_imagen")
     private String rutaImagen;
-    private boolean activo;
 
-    @OneToMany
-    @JoinColumn(name = "id_usuario")
-    private List<Rol> roles;
+    private boolean activo = true;
 
-    // Constructores
-    public Usuario() {}
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Rol> roles = new ArrayList<>();
 
-    public Usuario(String username, String password, String nombre, String apellidos, String correo) {
-        this.username = username;
-        this.password = password;
-        this.nombre = nombre;
-        this.apellidos = apellidos;
-        this.correo = correo;
-        this.activo = false;
+    // ====== Getters & Setters ======
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
-    // Getters y Setters
-    public Long getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getApellidos() {
+        return apellidos;
+    }
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
 
-    public String getApellidos() { return apellidos; }
-    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+    public String getCorreo() {
+        return correo;
+    }
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
 
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
+    public String getTelefono() {
+        return telefono;
+    }
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
 
-    public String getTelefono() { return telefono; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
+    }
 
-    public String getRutaImagen() { return rutaImagen; }
-    public void setRutaImagen(String rutaImagen) { this.rutaImagen = rutaImagen; }
+    public boolean isActivo() {
+        return activo;
+    }
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 
-    public boolean isActivo() { return activo; }
-    public void setActivo(boolean activo) { this.activo = activo; }
-
-    public List<Rol> getRoles() { return roles; }
-    public void setRoles(List<Rol> roles) { this.roles = roles; }
+    public List<Rol> getRoles() {
+        return roles;
+    }
+    public void setRoles(List<Rol> roles) {
+        this.roles = roles;
+    }
 }
