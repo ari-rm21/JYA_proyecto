@@ -20,28 +20,26 @@ public class ContactoController {
     @Autowired
     private MensajeContactoDao dao;
 
-@GetMapping("/contacto")
+  @GetMapping("/contacto")
 public String verFormulario(Model model) {
-    if (!model.containsAttribute("form")) {
-        model.addAttribute("form", new MensajeContacto());
+    if (!model.containsAttribute("mensaje")) {
+        model.addAttribute("mensaje", new MensajeContacto());
     }
     return "contacto";
 }
 
 @PostMapping("/contacto")
-public String enviar(@Valid @ModelAttribute("form") MensajeContacto form,
+public String enviar(@Valid @ModelAttribute("mensaje") MensajeContacto mensaje,
                      BindingResult br,
                      RedirectAttributes ra) {
-
     if (br.hasErrors()) {
-        ra.addFlashAttribute("org.springframework.validation.BindingResult.form", br);
-        ra.addFlashAttribute("form", form);
+        ra.addFlashAttribute("org.springframework.validation.BindingResult.mensaje", br);
+        ra.addFlashAttribute("mensaje", mensaje);
         return "redirect:/contacto";
     }
 
-    form.setFechaEnvio(LocalDateTime.now());
-    dao.save(form);
-
+    mensaje.setFechaEnvio(LocalDateTime.now());
+    dao.save(mensaje);
     ra.addFlashAttribute("ok", true);
     return "redirect:/contacto";
 }

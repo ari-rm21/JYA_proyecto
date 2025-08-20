@@ -1,42 +1,75 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-    <head th:fragment="head">
-        <title>J&A Select</title>
+<head th:fragment="head">
+  <title>J&A Select</title>
+</head>
+<body>
+<footer class="footer mt-auto bg-dark pt-5 pb-5" th:fragment="footer">
 
-    </head>
-    <body>
-        <footer class="footer mt-auto bg-dark pt-5 pb-5" th:fragment="footer">
+  <div class="container">
+    <div class="row">
 
-            <div class="container">
-                <div class="row">
+      <!-- Columna izquierda -->
+      <div class="col-md-8 d-flex justify-content-around flex-wrap text-start">
+        <div>
+          <p><a th:href="@{/politica}" class="footer-link">Envíos y devoluciones</a></p>
+          <p><a th:href="@{/politica}" class="footer-link">Políticas de la empresa</a></p>
+        </div>
+        <div>
+          <p><a th:href="@{/politica}" class="footer-link">Métodos de pago</a></p>
+          <p><a href="#" class="footer-link">Facebook</a></p>
+        </div>
+      </div>
 
-                    <!-- Columna izquierda -->
-                    <div class="col-md-8 d-flex justify-content-around  flex-wrap text-start">
-                        <div>
-                            <p><a th:href="@{/politica}" class="footer-link">Envíos y devoluciones</a></p>
-                            <p><a th:href="@{/politica}" class="footer-link">Políticas de la empresa</a></p>
-                        </div>
-                        <div>
-                            <p><a th:href="@{/politica}" class="footer-link">Métodos de pago</a></p>
-                            <p><a href="#" class="footer-link">Facebook</a></p>
-                        </div>
-                    </div>
+      <!-- Columna derecha -->
+      <div class="col-md-4 text-md-end mt-4 mt-md-0">
+        <h5 class="footer-title">Únete para estar<br>al tanto</h5>
 
-                    <!-- Columna derecha -->
-                    <div class="col-md-4 text-md-end mt-4 mt-md-0">
-                        <h5 class="footer-title">Únete para estar<br>al tanto</h5>
-                        <form>
-                            <input type="email" class="footer-input mt-2 mb-2" placeholder="Ingresa tu email aquí">
+        <!-- 🔔 Form de suscripción -->
+        <form th:action="@{/suscribirse}" method="post" class="subscribe-form">
+          <input type="email"
+                 name="email"
+                 class="footer-input mt-2 mb-2"
+                 placeholder="Ingresa tu email aquí"
+                 required>
+          <button type="submit" class="btn btn-custom w-100">Suscribirse ahora</button>
+        </form>
+      </div>
 
-                                <button type="submit" class="btn btn-custom w-100">Suscribirse ahora</button>
+    </div>
+  </div>
+</footer>
 
-                        </form>
-                    </div>
+<!-- SweetAlert2 para los popups -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-                </div>
-            </div>
-        </footer>
+<!-- ✅ Exitoso -->
+<script th:if="${sub_ok}">
+  Swal.fire({
+    icon: 'success',
+    title: '¡Suscripción exitosa!',
+    text: '[[${sub_ok}]] se suscribió correctamente.'
+  });
+</script>
 
-    </body>
+<!-- ℹ️ Ya estaba suscrito -->
+<script th:if="${sub_info}">
+  Swal.fire({
+    icon: 'info',
+    title: 'Ya estabas suscrito',
+    text: '[[${sub_info}]] ya está en nuestra lista.'
+  });
+</script>
+
+<!-- ❌ Error de validación -->
+<script th:if="${sub_err}">
+  Swal.fire({
+    icon: 'error',
+    title: 'Correo inválido',
+    text: '[[${sub_err}]]'
+  });
+</script>
+
+</body>
 </html>

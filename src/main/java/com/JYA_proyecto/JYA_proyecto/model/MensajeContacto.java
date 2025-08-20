@@ -24,7 +24,8 @@ public class MensajeContacto {
 
     @NotBlank
     @Lob
-    private String mensaje;
+    @Column(name = "mensaje", nullable = false)
+    private String contenido;   
 
     @Column(name = "fecha_envio")
     private LocalDateTime fechaEnvio;
@@ -42,8 +43,8 @@ public class MensajeContacto {
     public String getAsunto() { return asunto; }
     public void setAsunto(String asunto) { this.asunto = asunto; }
 
-    public String getMensaje() { return mensaje; }
-    public void setMensaje(String mensaje) { this.mensaje = mensaje; }
+    public String getContenido() { return contenido; }
+    public void setContenido(String contenido) { this.contenido = contenido; }
 
     public LocalDateTime getFechaEnvio() { return fechaEnvio; }
     public void setFechaEnvio(LocalDateTime fechaEnvio) { this.fechaEnvio = fechaEnvio; }

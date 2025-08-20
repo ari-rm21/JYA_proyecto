@@ -21,7 +21,17 @@ public class TiendaController {
     @Autowired
     private CategoriaService categoriaService;
 
-    // 👉 Mostrar todos los productos activos
+    // 👉 Página principal (index)
+    @GetMapping({"/", "/index"})
+    public String verIndex(Model model) {
+        // Puedes elegir cómo traer productos (destacados, últimos, todos activos, etc.)
+        List<Producto> productos = productoService.obtenerTodos();
+        model.addAttribute("productos", productos);
+
+        return "index"; // busca index.html en templates
+    }
+
+    // 👉 Mostrar todos los productos activos en tienda
     @GetMapping("/tienda")
     public String verTienda(Model model) {
         List<Producto> productos = productoService.obtenerTodos();
