@@ -1,143 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml">
     <head th:replace="~{layout/header :: head}">
-        <title>J&J Select</title>
-        <style>
-            /* Ajustes visuales mínimos */
-            .productos-section {
-                padding: 48px 0;
-            }
-            .productos-title {
-                color:#3b2b1e;
-            }
-            #carousel-container {
-                width: 900px;
-                max-width: 100%;
-                overflow: hidden;
-            }
-            #carousel-track {
-                display:flex;
-                gap:20px;
-                transition: transform .35s ease;
-            }
-            .producto-img {
-                width:265px;
-                height:258px;
-                object-fit: cover;
-                border-radius:8px;
-                box-shadow:0 4px 16px rgba(0,0,0,.08);
-                cursor:pointer;
-            }
-            .carousel-btn {
-                width:42px;
-                height:42px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-            }
-        </style>
+        <title>J&J Select</title>        
     </head>
     <body>
-        <header th:replace="~{layout/header :: header}"></header>
-
-        <!-- Hero -->
+        <header th:replace="~{layout/header :: header}"/>
         <div>
-            <img th:src="@{/images/hero-image.png}" alt="hero image" class="img-fluid w-100">
+               <img th:src="@{/images/hero-image.png}" alt="hero image" class="img-fluid">
         </div>
+        <div class="container py-5">
+            <h3 class="text-center fw-bold" style="color: #3b2b1e;">Productos nuevos</h3>
+            <div class="d-flex justify-content-center align-items-center gap-4 mt-4">
 
-        <!-- Productos -->
-        <section class="productos-section">
-            <div class="container">
-                <h3 class="text-center fw-bold productos-title mb-4">Productos nuevos</h3>
+                <!-- Flecha izquierda -->
+                <button class="btn btn-outline-dark" onclick="moveCarousel(-1)">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
 
-                <div class="d-flex align-items-center justify-content-center gap-3">
-                    <!-- Flecha izquierda -->
-                    <button type="button" class="btn btn-outline-dark carousel-btn" onclick="moveCarousel(-1)" aria-label="Anterior">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-
-                    <!-- Carrusel -->
-                   <div class="d-flex overflow-hidden" id="carousel-container" style="width: 800px;">
-                                <div class="d-flex transition" id="carousel-track" style="gap: 20px;">
-                                    <div th:each="producto : ${productos}">
-                                        <img th:src="@{${producto.imagenUrl}}"
-                                             th:alt="${producto.nombre}"
-                                             width="265" height="258"
-                                             style="cursor:pointer"
-                                             th:attr="data-nombre=${producto.nombre},
-                                             data-descripcion=${producto.descripcion},
-                                             data-precio=${producto.precio},
-                                             data-imgurl=${producto.imagenUrl}"
-                                             onclick="abrirModal(this)" />
-                                    </div>
-
-                                </div>
-                            </div>
-
-                    <!-- Flecha derecha -->
-                    <button type="button" class="btn btn-outline-dark carousel-btn" onclick="moveCarousel(1)" aria-label="Siguiente">
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Modal producto -->
-        <div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="productoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="productoModalLabel">Nombre del producto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body d-flex flex-column flex-md-row align-items-center">
-                        <img id="modalImagen" src="" alt="Imagen producto" class="img-fluid mb-3 mb-md-0 me-md-4" style="max-width: 250px;">
-                            <div>
-                                <p id="modalDescripcion" class="mb-1"></p>
-                                <p class="fw-bold" id="modalPrecio"></p>
-                                <button class="btn btn-dark">Agregar al carrito</button>
-                            </div>
+                <!-- Contenedor de productos -->
+                <div class="d-flex overflow-hidden" id="carousel-container" style="width: 600px;">
+                    <div class="d-flex transition" id="carousel-track" style="gap: 20px;">
+            
+                        <img th:src="@{/images/productos/producto-1.png}"  alt="Producto 1" width="265" height="258">
+                        <img th:src="@{/images/productos/depiladora.jpg}"  alt="Producto 2" width="265" height="258">
+                        <img th:src="@{/images/productos/producto-3.png}" alt="Producto 3" width="265" height="258">
+                        <!-- Las mismas otra vez para simular desplazamiento -->
+                        <img th:src="@{/images/productos/producto-1.png}" alt="Producto 1" width="265" height="258">
+                        <img th:src="@{/images/productos/depiladora.jpg}" alt="Producto 2" width="265" height="258">
+                        <img th:src="@{/images/productos/producto-3.png}" alt="Producto 3" width="265" height="258">
                     </div>
                 </div>
+
+                <!-- Flecha derecha -->
+                <button class="btn btn-outline-dark" onclick="moveCarousel(1)">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
         </div>
 
-        <footer th:replace="~{layout/footer :: footer}"></footer>
-
+        <footer th:replace="~{layout/footer :: footer}"/>
         <script>
             let currentIndex = 0;
             const track = document.getElementById('carousel-track');
-            const itemWidth = 285; // ancho de imagen + espacio
+            const itemWidth = 285; // ancho imagen (265) + espacio (20)
 
             function moveCarousel(direction) {
                 currentIndex += direction;
                 const maxIndex = track.children.length - 3;
 
-                if (currentIndex < 0)
-                    currentIndex = 0;
-                if (currentIndex > maxIndex)
-                    currentIndex = maxIndex;
+                if (currentIndex < 0) currentIndex = 0;
+                if (currentIndex > maxIndex) currentIndex = maxIndex;
 
                 const offset = -currentIndex * itemWidth;
                 track.style.transform = `translateX(${offset}px)`;
             }
-            //funcionalidad para el modal productos
-            function abrirModal(imgElement) {
-                const nombre = imgElement.getAttribute('data-nombre');
-                const descripcion = imgElement.getAttribute('data-descripcion');
-                const precio = imgElement.getAttribute('data-precio');
-                const imagenUrl = imgElement.getAttribute('data-imgurl');
-
-                document.getElementById('productoModalLabel').textContent = nombre;
-                document.getElementById('modalDescripcion').textContent = descripcion;
-                document.getElementById('modalPrecio').textContent = '₡' + precio;
-                document.getElementById('modalImagen').src = imagenUrl;
-
-                const modal = new bootstrap.Modal(document.getElementById('productoModal'));
-                modal.show();
-            }
-
-
         </script>
+
     </body>
 </html>

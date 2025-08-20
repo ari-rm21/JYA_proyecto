@@ -4,6 +4,7 @@ import com.JYA_proyecto.JYA_proyecto.model.Producto;
 import com.JYA_proyecto.JYA_proyecto.service.CarritoService;
 import com.JYA_proyecto.JYA_proyecto.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class CarritoController {
     private ProductoService productoService;
     
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String mostrarCarrito(Model model) {
         model.addAttribute("items", carritoService.obtenerItems());
         model.addAttribute("total", carritoService.calcularTotal());
@@ -30,6 +32,7 @@ public class CarritoController {
     }
     
     @PostMapping("/agregar")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String agregarProducto(@RequestParam Long productoId, 
                                  @RequestParam(defaultValue = "1") Integer cantidad,
                                  RedirectAttributes redirectAttributes) {
@@ -54,6 +57,7 @@ public class CarritoController {
     }
     
     @PostMapping("/actualizar")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String actualizarCantidad(@RequestParam Long productoId, 
                                    @RequestParam Integer cantidad,
                                    RedirectAttributes redirectAttributes) {
@@ -78,6 +82,7 @@ public class CarritoController {
     }
     
     @PostMapping("/eliminar")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String eliminarProducto(@RequestParam Long productoId,
                                  RedirectAttributes redirectAttributes) {
         carritoService.eliminarItem(productoId);
@@ -87,6 +92,7 @@ public class CarritoController {
     }
     
     @PostMapping("/limpiar")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String limpiarCarrito(RedirectAttributes redirectAttributes) {
         carritoService.limpiarCarrito();
         redirectAttributes.addFlashAttribute("mensaje", "Carrito vaciado");

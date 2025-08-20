@@ -4,6 +4,9 @@ import com.JYA_proyecto.JYA_proyecto.model.CarritoItem;
 import com.JYA_proyecto.JYA_proyecto.service.CarritoService;
 import com.JYA_proyecto.JYA_proyecto.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/checkout")
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class CompraController {
     
     @Autowired
@@ -23,7 +27,7 @@ public class CompraController {
     private ProductoService productoService;
     
     @GetMapping
-    public String mostrarCheckout(Model model) {
+    public String mostrarCheckout(Model model, Authentication authentication) {
         if (carritoService.estaVacio()) {
             return "redirect:/carrito";
         }
@@ -39,6 +43,7 @@ public class CompraController {
         model.addAttribute("impuestos", impuestos);
         model.addAttribute("envio", envio);
         model.addAttribute("total", total);
+        model.addAttribute("usuarioLogueado", authentication.getName());
         
         return "checkout";
     }
@@ -53,7 +58,8 @@ public class CompraController {
                                @RequestParam(required = false) String cvv,
                                @RequestParam(required = false) String fechaExpiracion,
                                @RequestParam(required = false) String telefonoSinpe,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes redirectAttributes,
+                               Authentication authentication) {
         
         if (carritoService.estaVacio()) {
             redirectAttributes.addFlashAttribute("mensaje", "El carrito está vacío");
@@ -94,6 +100,7 @@ public class CompraController {
             redirectAttributes.addFlashAttribute("detallesCompra", true);
             redirectAttributes.addFlashAttribute("nombreCliente", nombre);
             redirectAttributes.addFlashAttribute("emailCliente", email);
+            redirectAttributes.addFlashAttribute("usuarioLogueado", authentication.getName());
             
             return "redirect:/checkout/confirmacion";
             
@@ -105,7 +112,8 @@ public class CompraController {
     }
     
     @GetMapping("/confirmacion")
-    public String mostrarConfirmacion(Model model) {
+    public String mostrarConfirmacion(Model model, Authentication authentication) {
+        model.addAttribute("usuarioLogueado", authentication.getName());
         return "confirmacion-compra";
     }
 }

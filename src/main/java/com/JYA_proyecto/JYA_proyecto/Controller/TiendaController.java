@@ -21,16 +21,7 @@ public class TiendaController {
     @Autowired
     private CategoriaService categoriaService;
 
-    // Pagina principal (index)
-    @GetMapping({"/", "/index"})
-    public String verIndex(Model model) {
-
-        List<Producto> productos = productoService.obtenerTodos();
-        model.addAttribute("productos", productos);
-
-        return "index"; 
-    }
-
+    // 👉 Mostrar todos los productos activos
     @GetMapping("/tienda")
     public String verTienda(Model model) {
         List<Producto> productos = productoService.obtenerTodos();
@@ -40,10 +31,10 @@ public class TiendaController {
         model.addAttribute("categorias", categorias);
         model.addAttribute("categoriaSeleccionada", "Todos");
 
-        return "tienda"; 
+        return "tienda"; // busca tienda.html en templates
     }
 
-    // Mostrar productos filtrados por categoria
+    // 👉 Mostrar productos filtrados por categoría
     @GetMapping("/tienda/categoria/{nombre}")
     public String verPorCategoria(@PathVariable String nombre, Model model) {
         List<Producto> productos = productoService.obtenerPorCategoria(nombre);
