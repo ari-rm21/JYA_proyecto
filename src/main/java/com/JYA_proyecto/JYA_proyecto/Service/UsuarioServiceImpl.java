@@ -1,4 +1,4 @@
-package com.JYA_proyecto.JYA_proyecto.Service;
+package com.JYA_proyecto.JYA_proyecto.service;
 
 import com.JYA_proyecto.JYA_proyecto.dao.RolDao;
 import com.JYA_proyecto.JYA_proyecto.dao.UsuarioDao;

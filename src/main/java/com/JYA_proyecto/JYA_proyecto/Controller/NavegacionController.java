@@ -11,10 +11,10 @@ public class NavegacionController {
         return "index";
     }
 
-    @GetMapping("/contacto")
-    public String mostrarContacto() {
-        return "contacto";
-    }
+//    @GetMapping("/contacto")
+//    public String mostrarContacto() {
+//        return "contacto";
+//    }
 
     @GetMapping("/nosotros")
     public String mostrarNosotros() {
