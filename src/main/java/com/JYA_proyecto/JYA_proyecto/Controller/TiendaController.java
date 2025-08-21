@@ -27,7 +27,7 @@ public class TiendaController {
         List<Producto> productos = productoService.obtenerTodos();
         model.addAttribute("productos", productos);
 
-        return "index"; // busca index.html en templates
+        return "index"; 
     }
 
     //  Mostrar todos los productos activos en tienda

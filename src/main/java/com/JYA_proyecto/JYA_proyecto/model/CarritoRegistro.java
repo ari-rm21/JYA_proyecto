@@ -1,4 +1,4 @@
-// src/main/java/.../domain/CarritoRegistro.java
+
 package com.JYA_proyecto.JYA_proyecto.model;
 
 import jakarta.persistence.*;

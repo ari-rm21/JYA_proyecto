@@ -54,11 +54,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public void save(Usuario u, boolean crearRolUser) {
-        // Codifica SOLO si viene en plano (o si no parece BCrypt)
+        // Codifica SOLO si viene en plano o si no parece BCrypt
         if (u.getPassword() != null && !u.getPassword().isBlank() && !isBcrypt(u.getPassword())) {
             u.setPassword(passwordEncoder.encode(u.getPassword()));
         }
-        // TODO: si "crearRolUser" implica asignar rol, hazlo aquí.
+
         usuarioDao.save(u);
     }
 

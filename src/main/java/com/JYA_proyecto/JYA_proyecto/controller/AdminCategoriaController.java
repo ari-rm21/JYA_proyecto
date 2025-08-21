@@ -12,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/categorias")
-// @PreAuthorize("hasRole('ADMIN')")  // si usas seguridad por método
 public class AdminCategoriaController {
 
     @Autowired private CategoriaDao categoriaDao;
@@ -20,7 +19,7 @@ public class AdminCategoriaController {
     @GetMapping("/nueva")
     public String nueva(Model model) {
         model.addAttribute("categoria", new Categoria());
-        return "admin/categorias/form";   // <- vista que creamos abajo
+        return "admin/categorias/form";   
     }
 
     @GetMapping("/editar/{id}")

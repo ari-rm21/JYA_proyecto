@@ -11,9 +11,7 @@ public interface UsuarioService {
 
     Usuario getUsuarioPorUsername(String username);
 
-    // ❌ RECOMENDACIÓN: elimina este método porque usas contraseñas con BCrypt
-    // y ya no puedes buscar por username+password en BD.
-    // Usuario getUsuarioPorUsernameYPassword(String username, String password);
+
 
     Usuario getUsuarioPorUsernameOCorreo(String username, String correo);
 

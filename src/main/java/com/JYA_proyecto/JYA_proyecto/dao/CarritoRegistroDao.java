@@ -1,6 +1,6 @@
 package com.JYA_proyecto.JYA_proyecto.dao;
 
-import com.JYA_proyecto.JYA_proyecto.model.CarritoRegistro; // <-- asegúrate que apunte a tu paquete real
+import com.JYA_proyecto.JYA_proyecto.model.CarritoRegistro; 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;

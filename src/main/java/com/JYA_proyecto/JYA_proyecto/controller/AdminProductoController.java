@@ -1,7 +1,7 @@
 package com.JYA_proyecto.JYA_proyecto.controller;
 
 import com.JYA_proyecto.JYA_proyecto.dao.ProductoDao;
-import com.JYA_proyecto.JYA_proyecto.dao.CategoriaDao;    // <-- importa tu DAO de categoría
+import com.JYA_proyecto.JYA_proyecto.dao.CategoriaDao;    
 import com.JYA_proyecto.JYA_proyecto.model.Producto;
 import com.JYA_proyecto.JYA_proyecto.model.Categoria;
 import jakarta.validation.Valid;
@@ -19,19 +19,18 @@ import java.util.List;
 public class AdminProductoController {
 
     @Autowired private ProductoDao productoDao;
-    @Autowired private CategoriaDao categoriaDao;   // <-- inyéctalo
+    @Autowired private CategoriaDao categoriaDao;  
 
     /** Disponibiliza SIEMPRE la lista de categorías para esta vista */
     @ModelAttribute("categorias")
     public List<Categoria> categorias() {
-        return categoriaDao.findAll(); // o findAllByOrderByNombreAsc()
+        return categoriaDao.findAll();
     }
 
     /** Formulario: crear */
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         Producto p = new Producto();
-        // evita NPE con th:field="*{categoria.id}"
         p.setCategoria(new Categoria());
         model.addAttribute("producto", p);
         return "admin/productos/form";
@@ -53,7 +52,6 @@ public class AdminProductoController {
                           BindingResult br,
                           RedirectAttributes ra) {
         if (br.hasErrors()) {
-            // gracias a @ModelAttribute("categorias") el <select> no se queda vacío
             return "admin/productos/form";
         }
         productoDao.save(producto);
