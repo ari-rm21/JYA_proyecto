@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoriaDao extends JpaRepository<Categoria, Long> {
     Categoria findByNombre(String nombre);
+//    List<Categoria> findAllByOrderByNombreAsc();
 }
