@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns="http://www.w3.org/1999/xhtml">
     <head th:replace="~{layout/header :: head}">
         <title>Tienda | J&A Select</title> 
@@ -49,19 +49,19 @@
                             <div class="d-flex overflow-hidden" id="carousel-container" style="width: 800px;">
                                 <div class="d-flex transition" id="carousel-track" style="gap: 20px;">
 
-                                    <!-- Dentro del each -->
                                     <div th:each="producto : ${productos}" class="text-center">
                                         <img th:src="@{${producto.imagenUrl}}"
                                              th:alt="${producto.nombre}"
                                              width="265" height="258"
                                              style="cursor:pointer"
-                                             th:attr="data-nombre=${producto.nombre},
+                                             th:attr="data-id=${producto.id},
+                                             data-nombre=${producto.nombre},
                                              data-descripcion=${producto.descripcion},
                                              data-precio=${producto.precio},
                                              data-imgurl=${producto.imagenUrl}"
                                              onclick="abrirModal(this)"/>
 
-                                        <!-- ✅ Acciones admin por producto -->
+                                        <!--  Acciones admin por producto -->
                                         <div class="mt-2" sec:authorize="hasRole('ADMIN')">
                                             <a class="btn btn-outline-secondary btn-sm"
                                                th:href="@{/admin/productos/editar/{id}(id=${producto.id})}">Editar</a>
@@ -93,26 +93,34 @@
                                     <h5 class="modal-title" id="productoModalLabel">Nombre del producto</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                 </div>
+
                                 <div class="modal-body d-flex flex-column flex-md-row align-items-center">
                                     <img id="modalImagen" src="" alt="Imagen producto" class="img-fluid mb-3 mb-md-0 me-md-4" style="max-width: 250px;">
+
                                         <div>
                                             <p id="modalDescripcion" class="mb-1"></p>
                                             <p class="fw-bold" id="modalPrecio"></p>
-                                            <button class="btn btn-dark">Agregar al carrito</button>
+
+                                            <!-- form que se rellena con el id al abrir el modal -->
+                                            <form id="modalAddToCartForm" method="post">
+                                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                                <input type="hidden" name="cantidad" id="modalCantidad" value="1"/>
+                                                <button type="submit" class="btn btn-dark">Agregar al carrito</button>
+                                            </form>
                                         </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
-
                     <footer th:replace="~{layout/footer :: footer}"/>
 
-                    <!-- Script del carrusel -->
                     <script>
+
                         let currentIndex = 0;
                         const track = document.getElementById('carousel-track');
-                        const itemWidth = 285; // ancho de imagen + espacio
+                        const itemWidth = 285;
 
                         function moveCarousel(direction) {
                             currentIndex += direction;
@@ -127,19 +135,22 @@
                             track.style.transform = `translateX(${offset}px)`;
                         }
                         //funcionalidad para el modal productos
-                        function abrirModal(imgElement) {
-                            const nombre = imgElement.getAttribute('data-nombre');
-                            const descripcion = imgElement.getAttribute('data-descripcion');
-                            const precio = imgElement.getAttribute('data-precio');
-                            const imagenUrl = imgElement.getAttribute('data-imgurl');
+                        const ADD_BASE = /*[[@{/carrito/agregar/}]]*/ '/carrito/agregar/';
 
-                            document.getElementById('productoModalLabel').textContent = nombre;
-                            document.getElementById('modalDescripcion').textContent = descripcion;
-                            document.getElementById('modalPrecio').textContent = '₡' + precio;
-                            document.getElementById('modalImagen').src = imagenUrl;
+                        function abrirModal(el) {
+                            // Rellena datos visuales
+                            document.getElementById('productoModalLabel').textContent = el.dataset.nombre;
+                            document.getElementById('modalDescripcion').textContent = el.dataset.descripcion;
+                            document.getElementById('modalPrecio').textContent = '₡' + el.dataset.precio;
+                            document.getElementById('modalImagen').src = el.dataset.imgurl;
 
-                            const modal = new bootstrap.Modal(document.getElementById('productoModal'));
-                            modal.show();
+                            // Arma la acción POST con el id del producto
+                            const id = el.dataset.id;
+                            document.getElementById('modalAddToCartForm').action = ADD_BASE + id;
+
+                            // Muestra el modal
+                            const m = new bootstrap.Modal(document.getElementById('productoModal'));
+                            m.show();
                         }
 
 

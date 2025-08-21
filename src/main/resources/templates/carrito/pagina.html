@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="layout/header :: head"></head>
+    <body>
+        <header th:replace="layout/header :: header"></header>
+
+        <main class="container py-4">
+
+            <div class="row g-4">
+
+                <!-- Columna izquierda: listado de productos -->
+                <div class="col-md-7">
+                    <h5 class="mb-3">Mi carrito</h5>
+
+                    <!-- Carrito vacío -->
+                    <div th:if="${carrito == null or #lists.isEmpty(carrito.items)}" class="alert alert-light border">
+                        Tu carrito está vacío. <a class="alert-link" th:href="@{/tienda}">Ir a la tienda</a>
+                    </div>
+
+                    <!-- Ítems -->
+                    <div th:each="it : ${carrito != null ? carrito.items : {}}"
+                         class="py-3 border-bottom d-flex align-items-center justify-content-between">
+
+                        <!-- Info principal -->
+                        <div class="d-flex align-items-center gap-3">
+                            <img th:src="@{${it.imagenUrl}}" alt="" width="80" height="80" class="rounded border">
+                                <div>
+                                    <div class="fw-semibold" th:text="${it.nombre}">Nombre del producto</div>
+                                    <div class="text-muted small"
+                                         th:text="${'₡' + #numbers.formatDecimal(it.precioUnitario != null ? it.precioUnitario : 0, 0, 'POINT', 0, 'COMMA')}">
+                                        ₡0
+                                    </div>
+                                </div>
+                        </div>
+
+                        <!-- Controles, subtotal por ítem y eliminar -->
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Cantidad -->
+                            <form th:action="@{/carrito/actualizar/{id}(id=${it.productoId})}" method="post"
+                                  class="d-inline-flex align-items-center gap-1 m-0">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button class="btn btn-outline-secondary btn-sm" type="submit"
+                                            name="cantidad" th:value="${T(java.lang.Math).max(1, it.cantidad - 1)}">−</button>
+                                    <input class="form-control form-control-sm text-center" style="width:72px"
+                                           type="number" min="1" name="cantidad" th:value="${it.cantidad}">
+                                        <button class="btn btn-outline-secondary btn-sm" type="submit"
+                                                name="cantidad" th:value="${it.cantidad + 1}">+</button>
+                                        </form>
+
+                                        <!-- Subtotal por ítem -->
+                                        <div class="fw-semibold"
+                                             th:text="${'₡' + #numbers.formatDecimal(it.subtotal != null ? it.subtotal : 0, 0, 'POINT', 0, 'COMMA')}">₡0</div>
+
+                                        <!-- Eliminar -->
+                                        <form th:action="@{/carrito/eliminar/{id}(id=${it.productoId})}" method="post" class="m-0">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                <button class="btn btn-link text-danger p-0" title="Eliminar" type="submit">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                        </form>
+                                        </div>
+                                        </div>
+                                        </div>
+
+                                        <!-- Columna derecha: resumen -->
+                                        <div class="col-md-5">
+                                            <h5 class="mb-3">Resumen del pedido</h5>
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Subtotal</span>
+                                                        <strong th:text="${'₡' + #numbers.formatDecimal(subtotal, 0, 'POINT', 0, 'COMMA')}">₡0</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span>Envío</span>
+                                                        <strong th:text="${'₡' + #numbers.formatDecimal(envio, 0, 'POINT', 0, 'COMMA')}">₡0</strong>
+                                                    </div>
+                                                    <hr/>
+                                                    <div class="d-flex justify-content-between mb-3">
+                                                        <span>Total</span>
+                                                        <strong th:text="${'₡' + #numbers.formatDecimal(total, 0, 'POINT', 0, 'COMMA')}">₡0</strong>
+                                                    </div>
+
+                                                    <form th:action="@{/carrito/finalizar}" method="post" class="mt-2">
+                                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                            <button class="btn btn-dark w-100"
+                                                                    type="submit"
+                                                                    th:disabled="${#lists.isEmpty(carrito.items)}">
+                                                                Finalizar compra
+                                                            </button>
+                                                    </form>
+                                                    <p class="text-muted small mt-2">
+                                                        <i class="fa fa-lock me-1"></i> Pago seguro
+                                                    </p>
+
+                                                </div>
+                                            </div>
+
+                                            <form th:action="@{/carrito/limpiar}" method="post" class="mt-3">
+                                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                    <button class="btn btn-outline-danger w-100" type="submit"
+                                                            th:disabled="${carritoVacio}">Vaciar carrito</button>
+                                            </form>
+                                        </div>
+
+
+                                        </div>
+                                        </main>
+                                        <!-- Modal Compra Realizada -->
+                                        <div class="modal fade" id="compraOkModal" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content" style="border-radius: 1rem;">
+                                                    <div class="modal-header border-0">
+                                                        <h5 class="modal-title fw-semibold">Compra realizada</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Cerrar"></button>
+                                                    </div>
+
+                                                    <div class="modal-body text-center py-5">
+                                                        <div class="display-4 mb-3">
+                                                            <i class="fa fa-shopping-bag"></i>
+                                                            <i class="fa fa-check-circle ms-2"></i>
+                                                        </div>
+                                                        <p class="fs-5 mb-0">¡Gracias por tu compra!</p>
+                                                    </div>
+
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-dark w-100" data-bs-dismiss="modal">
+                                                            Cerrar
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Mostrar el modal si venimos de finalizar -->
+                                        <script th:inline="javascript">
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const compraOk = /*[[${compraOk}]]*/ false;
+                                                if (compraOk) {
+                                                    const modal = new bootstrap.Modal(document.getElementById('compraOkModal'));
+                                                    modal.show();
+                                                }
+                                            });
+                                        </script>
+
+                                        </body>
+                                        </html>

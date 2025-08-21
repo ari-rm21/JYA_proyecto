@@ -1,0 +1,77 @@
+<!-- fragments/carrito.html -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="drawer">
+
+    <div id="cart-overlay" class="cart-overlay" onclick="cerrarCarrito()"></div>
+
+    <aside id="cart-drawer" class="cart-drawer">
+
+        <header class="cart-header" th:with="qty=${carrito != null ? carrito.totalCantidad : 0}">
+            <span>Mi carrito</span>
+            <span class="muted"
+                  th:text="'(' + qty + (qty == 1 ? ' item)' : ' items)')">
+                (0 items)
+            </span>
+            <button class="cart-close" type="button" onclick="cerrarCarrito()">×</button>
+        </header>
+
+        <section class="cart-items">
+            <div th:if="${carrito == null || #lists.isEmpty(carrito.items)}" class="cart-empty">
+                Tu carrito está vacío.
+            </div>
+
+            <div class="cart-row" th:each="it : ${carrito != null ? carrito.items : #lists.emptyList()}">
+                <img class="cart-thumb" th:src="${it.imagenUrl}" alt="" />
+                <div class="cart-info">
+                    <div class="cart-name" th:text="${it.nombre}">Nombre</div>
+                    <div class="cart-qty">
+                        <form th:action="@{/carrito/actualizar/{id}(id=${it.productoId})}" method="post" class="qty-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" name="cantidad" th:value="${it.cantidad - 1}">-</button>
+                            <input class="qty-input" type="number" min="1" name="cantidad" th:value="${it.cantidad}">
+                            <button type="submit" name="cantidad" th:value="${it.cantidad + 1}">+</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="cart-price"
+                     th:text="${'₡' + #numbers.formatDecimal(it.subtotal, 0, 'POINT', 0, 'COMMA')}">₡0</div>
+                <form th:action="@{/carrito/eliminar/{id}(id=${it.productoId})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button class="cart-remove" title="Eliminar">×</button>
+                </form>
+            </div>
+        </section>
+
+        <footer class="cart-footer" th:with="sub=${carrito != null ? carrito.subtotal : 0}">
+            <div class="cart-subtotal">
+                <span>Subtotal</span>
+                <strong th:text="${'₡' + #numbers.formatDecimal(sub, 0, 'POINT', 0, 'COMMA')}">₡0</strong>
+            </div>
+            <a class="btn-primary" th:href="@{/carrito/pagina}">Ver carrito</a>
+        </footer>
+    </aside>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const flag = /*[[${abrirCarrito}?:false]]*/ false;
+            if (flag) {
+                abrirCarrito();
+            }
+        });
+        function abrirCarrito() {
+            document.getElementById('cart-overlay').classList.add('show');
+            document.getElementById('cart-drawer').classList.add('open');
+        }
+        function cerrarCarrito() {
+            document.getElementById('cart-overlay').classList.remove('show');
+            document.getElementById('cart-drawer').classList.remove('open');
+        }
+
+        /*<![CDATA[*/
+        const flag = /*[[${abrirCarrito}]]*/ false;
+        if (flag) {
+            abrirCarrito();
+        }
+        /*]]>*/
+    </script>
+
+</div>

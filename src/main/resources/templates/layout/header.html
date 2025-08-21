@@ -7,9 +7,9 @@
         <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
         <link th:href="@{/webjars/font-awesome/css/all.css}" rel="stylesheet"/>
         <link th:href="@{/css/header_css.css}" rel="stylesheet"/>
-         <link th:href="@{/css/footer_css.css}" rel="stylesheet"/> 
+        <link th:href="@{/css/footer_css.css}" rel="stylesheet"/> 
         <link th:href="@{/css/tienda.css}" rel="stylesheet"/>
-         <link th:href="@{/css/contacto.css}" rel="stylesheet"/> 
+        <link th:href="@{/css/contacto.css}" rel="stylesheet"/> 
         <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
         <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
         <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>       
@@ -41,12 +41,16 @@
                         </ul>
                     </div>
 
-                    <!-- Carrito -->
                     <div class="cart-icon-wrapper">
-                        <a th:href="@{/carrito}" class="nav-link p-0">
+                        <!-- Solo botón para abrir el drawer -->
+                        <button type="button" class="icono-carrito nav-link p-0" onclick="abrirCarrito()" aria-label="Abrir carrito">
                             <img th:src="@{/images/cart-icon.png}" alt="Carrito" width="28" height="28">
-                        </a>
+                            <span th:text="${carrito != null ? carrito.totalCantidad : 0}">0</span>
+                        </button>
                     </div>
+
+                    <!-- Inserta el drawer  -->
+                    <div th:replace="fragments/carrito :: drawer"></div>
                 </div>
             </nav>
 

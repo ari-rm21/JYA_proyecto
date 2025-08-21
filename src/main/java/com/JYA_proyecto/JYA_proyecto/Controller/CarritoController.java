@@ -1,102 +1,90 @@
-package com.JYA_proyecto.JYA_proyecto.Controller;
+package com.JYA_proyecto.JYA_proyecto.controller;
 
-import com.JYA_proyecto.JYA_proyecto.model.Producto;
+import com.JYA_proyecto.JYA_proyecto.model.Carrito;
 import com.JYA_proyecto.JYA_proyecto.service.CarritoService;
-import com.JYA_proyecto.JYA_proyecto.service.ProductoService;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.ui.Model;                      
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Optional;
+
+import java.math.BigDecimal;                   
 
 @Controller
 @RequestMapping("/carrito")
 public class CarritoController {
-    
+
     @Autowired
     private CarritoService carritoService;
-    
-    @Autowired
-    private ProductoService productoService;
-    
-    @GetMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String mostrarCarrito(Model model) {
-        model.addAttribute("items", carritoService.obtenerItems());
-        model.addAttribute("total", carritoService.calcularTotal());
-        model.addAttribute("cantidadTotal", carritoService.obtenerCantidadTotal());
-        return "carrito";
+
+    @GetMapping("/drawer")
+    public String drawer(Model model) {
+        model.addAttribute("carrito", carritoService.getCarrito());
+        return "fragments/carrito :: drawer";
     }
-    
-    @PostMapping("/agregar")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String agregarProducto(@RequestParam Long productoId, 
-                                 @RequestParam(defaultValue = "1") Integer cantidad,
-                                 RedirectAttributes redirectAttributes) {
-        
-        Optional<Producto> producto = productoService.obtenerPorId(productoId);
-        
-        if (producto.isPresent()) {
-            if (producto.get().getStock() >= cantidad) {
-                carritoService.agregarItem(producto.get(), cantidad);
-                redirectAttributes.addFlashAttribute("mensaje", "Producto agregado al carrito exitosamente");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-            } else {
-                redirectAttributes.addFlashAttribute("mensaje", "Stock insuficiente");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-            }
-        } else {
-            redirectAttributes.addFlashAttribute("mensaje", "Producto no encontrado");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-        }
-        
-        return "redirect:/tienda";
+
+    /** Página completa “Ver carrito” */
+    @GetMapping("/pagina")
+    public String pagina(Model model) {
+        Carrito c = carritoService.getCarrito();
+
+        BigDecimal subtotal = c.getSubtotal();
+        BigDecimal envio = c.getItems().isEmpty()
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(2500);
+        BigDecimal total = subtotal.add(envio);
+
+        model.addAttribute("carrito", c);
+        model.addAttribute("subtotal", subtotal);
+        model.addAttribute("envio", envio);
+        model.addAttribute("total", total);
+        model.addAttribute("carritoVacio", c.getItems().isEmpty());
+
+        return "carrito/pagina";
     }
-    
-    @PostMapping("/actualizar")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String actualizarCantidad(@RequestParam Long productoId, 
-                                   @RequestParam Integer cantidad,
-                                   RedirectAttributes redirectAttributes) {
-        
-        if (cantidad > 0) {
-            Optional<Producto> producto = productoService.obtenerPorId(productoId);
-            if (producto.isPresent() && producto.get().getStock() >= cantidad) {
-                carritoService.actualizarCantidad(productoId, cantidad);
-                redirectAttributes.addFlashAttribute("mensaje", "Cantidad actualizada");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-            } else {
-                redirectAttributes.addFlashAttribute("mensaje", "Stock insuficiente");
-                redirectAttributes.addFlashAttribute("tipoMensaje", "error");
-            }
-        } else {
-            carritoService.eliminarItem(productoId);
-            redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado del carrito");
-            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-        }
-        
-        return "redirect:/carrito";
+
+    @PostMapping("/agregar/{id}")
+    public String agregar(@PathVariable("id") Long productoId,
+                          @RequestParam(defaultValue = "1") int cantidad,
+                          RedirectAttributes ra,
+                          jakarta.servlet.http.HttpServletRequest req) {
+        carritoService.agregar(productoId, cantidad);
+        ra.addFlashAttribute("abrirCarrito", true);
+        String ref = req.getHeader("Referer");
+        return "redirect:" + (ref != null ? ref : "/tienda");
     }
-    
-    @PostMapping("/eliminar")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String eliminarProducto(@RequestParam Long productoId,
-                                 RedirectAttributes redirectAttributes) {
-        carritoService.eliminarItem(productoId);
-        redirectAttributes.addFlashAttribute("mensaje", "Producto eliminado del carrito");
-        redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-        return "redirect:/carrito";
+
+    @PostMapping("/actualizar/{id}")
+    public String actualizar(@PathVariable("id") Long productoId,
+                             @RequestParam @Min(1) int cantidad,
+                             RedirectAttributes ra) {
+        carritoService.actualizar(productoId, cantidad);
+        ra.addFlashAttribute("abrirCarrito", true);
+        return "redirect:/carrito/pagina";
     }
-    
+
+    @PostMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable("id") Long productoId, RedirectAttributes ra) {
+        carritoService.eliminar(productoId);
+        ra.addFlashAttribute("abrirCarrito", true);
+        return "redirect:/carrito/pagina";
+    }
+
     @PostMapping("/limpiar")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String limpiarCarrito(RedirectAttributes redirectAttributes) {
-        carritoService.limpiarCarrito();
-        redirectAttributes.addFlashAttribute("mensaje", "Carrito vaciado");
-        redirectAttributes.addFlashAttribute("tipoMensaje", "success");
-        return "redirect:/carrito";
+    public String limpiar(RedirectAttributes ra) {
+        carritoService.limpiar();
+        ra.addFlashAttribute("abrirCarrito", true);
+        return "redirect:/carrito/pagina";
     }
+    @PostMapping("/finalizar")
+public String finalizarCompra(RedirectAttributes ra) {
+    carritoService.limpiar();
+
+
+    ra.addFlashAttribute("compraOk", true);
+
+    return "redirect:/carrito/pagina";
+}
 }
